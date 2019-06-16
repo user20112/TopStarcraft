@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>Default Page</title>
+    <title id=TopTitle>Default Title</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/font-awesome.min.css" rel="stylesheet">
     <link href="css/pe-icons.css" rel="stylesheet">
@@ -68,9 +68,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="center gap fade-down section-heading">
-                                    <h2 class="main-title">DefaultPage</h2>
+                                    <h2 class="main-title" id="Title section">DefaultPage</h2>
                                     <hr>
-                                    <p>MlemityMlemity</p>
                                 </div>
                             </div>   
                         </div>
@@ -84,17 +83,11 @@
         <section id="about-us" class="white">
             <div class="container">
                 <div class="gap"></div>
-				
                 <div class="row">
                 <div class="col-md-12 fade-up">
-                       
+				<img src="TestImage.jpg" alt="Image Goes Here" id="PostImage">
+                      <p id="PostContent">Defualt Text</p> 
                  </div>
-                </div>
-				<div class="row">
-                    <div class="col-md-12 fade-up">
-                       
-                    </div>
-                    
                 </div>
             </div>      
         </section>
@@ -109,7 +102,6 @@
 	                                    <blockquote>
 	                                        <div class="row">
 	                                            <div class="col-sm-3 text-center">
-	                                                
 	                                            </div>
 	                                            <div class="col-sm-9">
 	                                                <p id="Qoute">He who has a why to live can bear almost any how.</p>
@@ -167,8 +159,12 @@
     <script src="js/jquery.prettyPhoto.js"></script>   
     <script src="js/init.js"></script>
 	<script>
-			window.onload = function() { GetQoute() };
+			window.onload = function() { 
+			GetQoute(); 
+			GetPost();
+			};
 		var Qouterequest;
+		var PostRequest;
 		function GetQoute(){
 			Qouterequest = new XMLHttpRequest(); // message sent to server 
 			var fd = new FormData();  
@@ -177,10 +173,34 @@
 			Qouterequest.onreadystatechange = QouteServerResponded; // setup callback (Asynchronous)
 			Qouterequest.open("POST", "php/request.php"); // prepare POST message
 			Qouterequest.send(fd); 
-			
-
 		}// end OnLoad
+		function GetPost()
+		{
+			PostRequest = new XMLHttpRequest(); // message sent to server 
+			var mlerm = new FormData();  
+			mlerm.append("request", "GetPost"); 
+			mlerm.append("ID", getUrlVars()["x"]); 
+			PostRequest.onreadystatechange = PostServerResponded; // setup callback (Asynchronous)
+			PostRequest.open("POST", "php/request.php"); // prepare POST message
+			PostRequest.send(mlerm); 
+		}
+function PostServerResponded(){ // called when the server responds to message 
+			if(PostRequest.readyState !== XMLHttpRequest.DONE) { return; } 
+			if(PostRequest.status !== 200){ return; } // check for HTTP OK 
+			var json_arr; 
+			var json; 
 
+			try{ 
+				json_arr = JSON.parse(PostRequest.responseText); 
+			}catch(ex){
+				alert(ex.message);  
+			}
+			document.getElementById("TopTitle").innerHTML =json_arr[0].title;
+			document.getElementById("PostImage").src  ="PostImages/"+json_arr[0].ImagePath;
+			document.getElementById("PostImage").alt  =json_arr[0].ImagePath;
+			document.getElementById("Title section").innerHTML =json_arr[0].title;
+			document.getElementById("PostContent").innerHTML =json_arr[0].Text;
+		}
 	
 		function QouteServerResponded(){ // called when the server responds to message 
 			if(Qouterequest.readyState !== XMLHttpRequest.DONE) { return; } 
@@ -196,6 +216,13 @@
 			document.getElementById("Qoute").innerHTML =json_arr[0].Qoute;
 			document.getElementById("Person").innerHTML =json_arr[0].Person;
 		}
+		function getUrlVars() {
+			var vars = {};
+			var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+			vars[key] = value;
+		});
+    return vars;
+}
 	</script>
 </body>
 </html>

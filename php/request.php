@@ -11,39 +11,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 	case "Test":
 		$result = "Test"; 
 		break;
-		
-	case "GetSchedule":
-		$result = get_schedule(); 
+		case "GetPost":
+		$result = get_post($_POST['ID']);; 
 		break;
-	case "GetCards":
-		$result = GetallGiftCards(); 
-		break;
-	case "GetList":
-		$result = GetList(); 
-		break;
-	case "AddProjIdea":
-		$result = AddProjIdea($_POST['Title'],$_POST['Desc'],$_POST['ID']); 
-		break;
-	case "AddCard":
-		$result = AddCard($_POST['TimeOfSale'],$_POST['CERT'],$_POST['Account'],$_POST['Balance']);
-		break;
-	case "EditSchedule":
-		$result = EditSchedule($_POST['Task'],$_POST['Hour'],$_POST['Day']); 
-		break;	
-	case "GetProjects":
-		$result = get_all_projects(); 
-		break;	
-	case "GetUnits":
-		$result = get_all_units(); 
-		break;	
-	case "GetStructures":
-		$result = get_all_structures(); 
-		break;
-	case "GetUpgrades":
-		$result = get_all_upgrades(); 
-		break;
-	case "GetPlans":
-		$result = get_all_plans(); 
+		case "AddPost":
+		$result = add_post($_POST['PostId'],$_POST['Text'],$_POST['ImagePath'],$_POST['title'],$_POST['tags'],$_POST['Score']);
+		break;		
+		case "GetPostID":
+		$result = GetPostID(); 
 		break;
 	case "AddMessage":
 		AddMessage($_POST['DisplayName'],$_POST['Message'],date('H:i'),$_POST['ID']);

@@ -201,7 +201,7 @@
 
 	
 	function authors_arrived(){ // called when the server responds to message 
-
+document.getElementById("section_center").innerHTML=request.responseText;
 			if(request.readyState !== XMLHttpRequest.DONE) { return; } 
 			if(request.status !== 200){ return; } // check for HTTP OK 
 

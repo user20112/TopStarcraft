@@ -76,7 +76,7 @@
             </div><!--/.carousel-inner-->
         </div><!--/.carousel-->
     </section><!--/#main-slider-->
-
+ 
     <div id="content-wrapper">
         <section id="about-us" class="white">
             <div class="container">
@@ -84,15 +84,15 @@
 				
                 <div class="row">
                 <div class="col-md-12 fade-up">
-					<form action="php/upload.php" method="post" enctype="multipart/form-data">
+					<form id = "ImageForm" action="php/upload.php" method="post" enctype="multipart/form-data">
 					Select image to upload:
 					<input type="file" name="fileToUpload" id="fileToUpload">
-					<input type="submit" value="Upload Image" name="submit">
+					<input type="submit" value="Send" style="display:none;"/>
 					</form>
                 <form>
 					<input id="Title" type="text" name="DisplayName" placeholder="Title">
 					<input id="Tags" type="text" name="Tags" placeholder="Tags">
-					<input id="Desc" type="text" name="Message" placeholder="Desc">
+					<input id="Text" type="text" name="Message" placeholder="Text">
 					<input type="button" value="Submit" onclick="SubmissionFunction()" >
 				</form>	
                  </div>
@@ -166,6 +166,10 @@
 	<script>
 			window.onload = function() { GetQoute() };
 		var Qouterequest;
+		var SubmissionRequest;
+		
+		var IDRequest;
+		var filename;
 		function GetQoute(){
 			Qouterequest = new XMLHttpRequest(); // message sent to server 
 			var fd = new FormData();  
@@ -177,8 +181,57 @@
 			
 
 		}// end OnLoad
+		function SubmissionFunction()
+		{
+			filename=document.getElementById("fileToUpload").value.substr(12);
+			document.getElementById("Qoute").innerHTML ="Button Clicked";
+			IDRequest = new XMLHttpRequest(); // message sent to server 
+			var fd = new FormData();
+			fd.append("request", "GetPostID");
+			IDRequest.open("POST", "php/request.php"); // prepare POST message
+			IDRequest.onreadystatechange = IDResponse; // setup callback (Asynchronous)
+			IDRequest.send(fd);
+			document.getElementById("Qoute").innerHTML ="SentSub";
+		}
+	function IDResponse(){ // called when the server responds to message 
+			if(IDRequest.readyState !== XMLHttpRequest.DONE) { return; } 
+			if(IDRequest.status !== 200){ return; } // check for HTTP OK 
+			var json_arr; 
+			var json; 
+			try{ 
+				json_arr = JSON.parse(IDRequest.responseText); 
+			}catch(ex){
+				alert(ex.message);  
+			}
+			document.getElementById("Qoute").innerHTML ="Resposne Received";
+			SubmissionRequest = new XMLHttpRequest(); // message sent to server 
+			var fd = new FormData();
+			document.getElementById("Qoute").innerHTML ="Form Created";
+			fd.append("request", "AddPost");
+			fd.append("title",document.getElementById("Title").value);
+			fd.append("ImagePath",filename);
+			fd.append("Text", document.getElementById("Text").value);
+			fd.append("PostId",parseInt(json_arr[0].PostID)+1);
+			fd.append("tags", document.getElementById("Tags").value);
+			fd.append("Score",0); 
+			SubmissionRequest.open("POST", "php/request.php"); // prepare POST message
+			SubmissionRequest.onreadystatechange = PostRequestReceived; // setup callback (Asynchronous)
+			SubmissionRequest.send(fd);
+			
+			document.getElementById("Qoute").innerHTML =parseInt(json_arr[0].PostID)+1;
 
-	
+		}
+function PostRequestReceived(){ // called when the server responds to message 
+			if(SubmissionRequest.readyState !== XMLHttpRequest.DONE) { return; } 
+			if(SubmissionRequest.status !== 200){ return; } // check for HTTP OK 
+			var json_arr; 
+			var json; 
+			try{ 
+				json_arr = JSON.parse(SubmissionRequest.responseText); 
+			}catch(ex){
+				alert(ex.message);  
+			}
+		}
 		function QouteServerResponded(){ // called when the server responds to message 
 			if(Qouterequest.readyState !== XMLHttpRequest.DONE) { return; } 
 			if(Qouterequest.status !== 200){ return; } // check for HTTP OK 
