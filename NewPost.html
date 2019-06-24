@@ -18,7 +18,8 @@
     <![endif]-->       
     <script src="js/jquery.js"></script>
     <link rel="shortcut icon" href="images/ico/favicon.ico">
-
+<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+   <script>tinymce.init({ selector:'textarea' });</script>
     <script type="text/javascript">
     jQuery(document).ready(function($){
     'use strict';
@@ -84,15 +85,16 @@
 				
                 <div class="row">
                 <div class="col-md-12 fade-up">
-					<form id = "ImageForm" action="php/upload.php" method="post" enctype="multipart/form-data">
-					Select image to upload:
+					<textarea id="PostText">Insert Your Post Text Here</textarea>
+					<form  target="hidden-form" id = "ImageForm" action="php/upload.php" method="post" enctype="multipart/form-data">
+					Select image For Left Side:
 					<input type="file" name="fileToUpload" id="fileToUpload">
 					<input type="submit" value="Send" style="display:none;"/>
 					</form>
+					<IFRAME style="display:none" name="hidden-form"></IFRAME> 
                 <form>
 					<input id="Title" type="text" name="DisplayName" placeholder="Title">
 					<input id="Tags" type="text" name="Tags" placeholder="Tags">
-					<input id="Text" type="text" name="Message" placeholder="Text">
 					<input type="button" value="Submit" onclick="SubmissionFunction()" >
 				</form>	
                  </div>
@@ -174,7 +176,6 @@
 			Qouterequest = new XMLHttpRequest(); // message sent to server 
 			var fd = new FormData();  
 			fd.append("request", "GetQoute"); 
-			fd.append("ID", "100"); 
 			Qouterequest.onreadystatechange = QouteServerResponded; // setup callback (Asynchronous)
 			Qouterequest.open("POST", "php/request.php"); // prepare POST message
 			Qouterequest.send(fd); 
@@ -184,14 +185,13 @@
 		function SubmissionFunction()
 		{
 			filename=document.getElementById("fileToUpload").value.substr(12);
-			document.getElementById("Qoute").innerHTML ="Button Clicked";
+			document.getElementById("ImageForm").submit();
 			IDRequest = new XMLHttpRequest(); // message sent to server 
 			var fd = new FormData();
 			fd.append("request", "GetPostID");
 			IDRequest.open("POST", "php/request.php"); // prepare POST message
 			IDRequest.onreadystatechange = IDResponse; // setup callback (Asynchronous)
 			IDRequest.send(fd);
-			document.getElementById("Qoute").innerHTML ="SentSub";
 		}
 	function IDResponse(){ // called when the server responds to message 
 			if(IDRequest.readyState !== XMLHttpRequest.DONE) { return; } 
@@ -203,23 +203,19 @@
 			}catch(ex){
 				alert(ex.message);  
 			}
-			document.getElementById("Qoute").innerHTML ="Resposne Received";
+			
 			SubmissionRequest = new XMLHttpRequest(); // message sent to server 
 			var fd = new FormData();
-			document.getElementById("Qoute").innerHTML ="Form Created";
 			fd.append("request", "AddPost");
 			fd.append("title",document.getElementById("Title").value);
 			fd.append("ImagePath",filename);
-			fd.append("Text", document.getElementById("Text").value);
-			fd.append("PostId",parseInt(json_arr[0].PostID)+1);
+			fd.append("Text", mysql_real_escape_string(tinyMCE.activeEditor.getContent({ format: 'text' })));
+			fd.append("PostId",parseInt(json_arr[1].PostID)+1);
 			fd.append("tags", document.getElementById("Tags").value);
 			fd.append("Score",0); 
 			SubmissionRequest.open("POST", "php/request.php"); // prepare POST message
 			SubmissionRequest.onreadystatechange = PostRequestReceived; // setup callback (Asynchronous)
 			SubmissionRequest.send(fd);
-			
-			document.getElementById("Qoute").innerHTML =parseInt(json_arr[0].PostID)+1;
-
 		}
 function PostRequestReceived(){ // called when the server responds to message 
 			if(SubmissionRequest.readyState !== XMLHttpRequest.DONE) { return; } 
@@ -246,6 +242,30 @@ function PostRequestReceived(){ // called when the server responds to message
 			document.getElementById("Qoute").innerHTML =json_arr[0].Qoute;
 			document.getElementById("Person").innerHTML =json_arr[0].Person;
 		}
+		function mysql_real_escape_string (str) {
+    return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
+        switch (char) {
+            case "\0":
+                return "\\0";
+            case "\x08":
+                return "\\b";
+            case "\x09":
+                return "\\t";
+            case "\x1a":
+                return "\\z";
+            case "\n":
+                return "\\n";
+            case "\r":
+                return "\\r";
+            case "\"":
+            case "'":
+            case "\\":
+            case "%":
+                return "\\"+char; // prepends a backslash to backslash, percent,
+                                  // and double/single quotes
+        }
+    });
+}
 	</script>
 </body>
 </html>
