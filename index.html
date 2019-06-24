@@ -118,7 +118,7 @@
                             </div>
                             <div class="media-body fade-up">
                                 <h3 class="media-heading"><a href="Protoss.html">Protoss Guides</a></h3>
-                                <p>All Guides for the protoss race sorted by score with a getting started section.</p>
+                                <p>All Guides for the Protoss race sorted by score with a getting started section.</p>
                             </div>
                         </div>
                     </div><!--/.col-md-4-->
@@ -237,7 +237,6 @@
 			Qouterequest = new XMLHttpRequest(); // message sent to server 
 			var fd = new FormData();  
 			fd.append("request", "GetQoute"); 
-			fd.append("ID", "100"); 
 			Qouterequest.onreadystatechange = QouteServerResponded; // setup callback (Asynchronous)
 			Qouterequest.open("POST", "php/request.php"); // prepare POST message
 			Qouterequest.send(fd); 

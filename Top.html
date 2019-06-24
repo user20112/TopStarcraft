@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>Default Page</title>
+    <title>Top Posts</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/font-awesome.min.css" rel="stylesheet">
     <link href="css/pe-icons.css" rel="stylesheet">
@@ -18,6 +19,7 @@
     <![endif]-->       
     <script src="js/jquery.js"></script>
     <link rel="shortcut icon" href="images/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57x57.png">
 
     <script type="text/javascript">
     jQuery(document).ready(function($){
@@ -68,9 +70,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="center gap fade-down section-heading">
-                                    <h2 class="main-title">DefaultPage</h2>
-                                    <hr>
-                                    <p>MlemityMlemity</p>
+                                    <h2 class="main-title" Id="Title" >Top Posts</h2>
                                 </div>
                             </div>   
                         </div>
@@ -78,23 +78,17 @@
                 </div><!--/.item-->
             </div><!--/.carousel-inner-->
         </div><!--/.carousel-->
-    </section><!--/#main-slider-->
+    </sect ion><!--/#main-slider-->
 
     <div id="content-wrapper">
         <section id="about-us" class="white">
             <div class="container">
-                <div class="gap"></div>
-				
                 <div class="row">
-                <div class="col-md-12 fade-up">
-                       
-                 </div>
-                </div>
-				<div class="row">
-                    <div class="col-md-12 fade-up">
-                       
-                    </div>
-                    
+				<div class="center">
+                 <section id="section_center"></section>
+					<div class="row-center">
+					</div>
+				</div>
                 </div>
             </div>      
         </section>
@@ -126,8 +120,9 @@
 	      		</div>
   		</section>
     </div>
+	
 
-   <div id="footer-wrapper">
+    <div id="footer-wrapper">
         <section id="bottom" class="">
             <div class="container">
                 <div class="row">
@@ -168,21 +163,98 @@
     <script src="js/init.js"></script>
 	<script>
 			window.onload = function() { GetQoute() };
+		var request;
+		var request2;		
+		var CurrentForm=100;
+		var NonPlus=0;
+		var x=0;
+	function RequestPosts(){
+			// form data objects found at: 
+			// https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
+			request = new XMLHttpRequest(); // message sent to server 
+			var fd = new FormData(); 
+			fd.append("request", "GetPosts"); 
+			request.onreadystatechange = Posts_arrived; // setup callback (Asynchronous)
+			request.open("POST", "php/request.php"); // prepare POST message
+			request.send(fd); 
+		}// end req_authors
+
+	function Posts_arrived(){  // called when the server responds to message 
+document.getElementById("section_center").innerHTML=request.responseText;
+			if(request.readyState !== XMLHttpRequest.DONE) { return; } 
+			if(request.status !== 200){ return; } // check for HTTP OK 
+
+			var json_arr; 
+			var json; 
+
+			try{ 
+				json_arr = JSON.parse(request.responseText); 
+			}catch(ex){
+				alert(ex.message);  
+			}
+
+			var i; 
+			var tbl_data = '<table class="table text-center">'; 
+			
+			tbl_data += "<colgroup>"; 
+
+			tbl_data += '<col width="20%"></col>'; 
+			tbl_data += '<col width="60%"></col>'; 
+			tbl_data += '<col width="20%"></col>'; 
+
+			tbl_data += "</colgroup>"; 
+
+			for(i = 0; i < json_arr.length; i++)
+			{
+				var row = json_arr[i]; 
+				if ( i==0 )
+				{
+				if (json_arr.length>8)
+				{
+				i=json_arr.length-8;
+				}
+				tbl_data += "<tr>";
+				tbl_data += "<td>"; 
+				tbl_data += "Image"; 
+				tbl_data += "</td>"; 
+				tbl_data += "<td>"; 
+				tbl_data += "Post Title"; 
+				tbl_data += "</td>"; 
+				tbl_data += "<td >"; 
+				tbl_data += "Score"; 
+				tbl_data += "</td>"; 
+				tbl_data += "</tr>"; // end item
+				}
+				tbl_data += "<tr id=" + row.PostId + ">";
+				tbl_data += "<td>"; 
+				tbl_data += '<img src="PostImages/'+row.ImagePath+'" alt="Image Goes Here" id="PostImage" ';  
+				tbl_data += "</td>"; 
+				tbl_data += '<td><a href="http://topstarcraft.online/Post.html?x='+row.PostId+'">'; 
+				tbl_data += row.title; 
+				tbl_data += "</a></td>";
+				tbl_data += "<td>"; 
+				tbl_data += row.Score; 
+				tbl_data += "</td>"; 
+				tbl_data += "</tr>"; // end item
+			}
+			tbl_data += "</table>"; 
+			document.getElementById("section_center").innerHTML = "<div class='scrollable'>" + tbl_data + "</div>"; // display table
+			x+=1;
+		}
 		var Qouterequest;
 		function GetQoute(){
 			Qouterequest = new XMLHttpRequest(); // message sent to server 
 			var fd = new FormData();  
-			fd.append("request", "GetQoute"); 
-			fd.append("ID", "100"); 
+			fd.append("request", "GetQoute");
 			Qouterequest.onreadystatechange = QouteServerResponded; // setup callback (Asynchronous)
 			Qouterequest.open("POST", "php/request.php"); // prepare POST message
-			Qouterequest.send(fd); 
-			
-
+			Qouterequest.send(fd);
+			 RequestPosts();
 		}// end OnLoad
 
 	
 		function QouteServerResponded(){ // called when the server responds to message 
+		document.getElementById("Qoute").innerHTML ="arrived";
 			if(Qouterequest.readyState !== XMLHttpRequest.DONE) { return; } 
 			if(Qouterequest.status !== 200){ return; } // check for HTTP OK 
 			var json_arr; 

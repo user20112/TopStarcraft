@@ -68,7 +68,12 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="center gap fade-down section-heading">
-                                    <h2 class="main-title" id="Title section">DefaultPage</h2>
+                                    <button type="submit" name="beer" value="Upvote_Clicked" onclick="Upvote_Clicked()">
+									<img src="PostImages/Upvote.png" style ="width:20px;" />
+									</button><h2 class="main-title" id="Title section">DefaultPage</h2>
+									<button type="submit" name="beer" value="Downvote_Clicked" onclick="Downvote_Clicked()">
+									<img src="PostImages/Downvote.png" style ="width:20px;"/>
+									</button>
                                     <hr>
                                 </div>
                             </div>   
@@ -85,8 +90,7 @@
                 <div class="gap"></div>
                 <div class="row">
                 <div class="col-md-12 fade-up">
-				<img src="TestImage.jpg" alt="Image Goes Here" id="PostImage">
-                      <p id="PostContent">Defualt Text</p> 
+					  <p style="white-space: pre-wrap;" id="PostContent"><img src="TestImage.jpg" alt="Image Goes Here" id="PostImage" align="left"> Defualt Text </p>
                  </div>
                 </div>
             </div>      
@@ -165,15 +169,36 @@
 			};
 		var Qouterequest;
 		var PostRequest;
+		var UpvoteRequest;
+		var DownvoteRequest;
 		function GetQoute(){
 			Qouterequest = new XMLHttpRequest(); // message sent to server 
 			var fd = new FormData();  
 			fd.append("request", "GetQoute"); 
-			fd.append("ID", "100"); 
 			Qouterequest.onreadystatechange = QouteServerResponded; // setup callback (Asynchronous)
 			Qouterequest.open("POST", "php/request.php"); // prepare POST message
-			Qouterequest.send(fd); 
+			Qouterequest.send(fd);
 		}// end OnLoad
+		function Upvote_Clicked()
+		{
+			UpvoteRequest = new XMLHttpRequest(); // message sent to server 
+			var fd = new FormData();  
+			fd.append("request", "UpVote"); 
+			fd.append("ID", getUrlVars()["x"]); 
+			UpvoteRequest.open("POST", "php/request.php"); // prepare POST message
+			UpvoteRequest.send(fd);
+			alert("You have Upvoted this amazing post");
+		}
+		function Downvote_Clicked()
+		{
+			DownvoteRequest = new XMLHttpRequest(); // message sent to server 
+			var fd = new FormData();  
+			fd.append("request", "DownVote"); 
+			fd.append("ID", getUrlVars()["x"]); 
+			DownvoteRequest.open("POST", "php/request.php"); // prepare POST message
+			DownvoteRequest.send(fd);
+			alert("You have Downvoted this trash");
+		}
 		function GetPost()
 		{
 			PostRequest = new XMLHttpRequest(); // message sent to server 
@@ -196,10 +221,10 @@ function PostServerResponded(){ // called when the server responds to message
 				alert(ex.message);  
 			}
 			document.getElementById("TopTitle").innerHTML =json_arr[0].title;
-			document.getElementById("PostImage").src  ="PostImages/"+json_arr[0].ImagePath;
-			document.getElementById("PostImage").alt  =json_arr[0].ImagePath;
 			document.getElementById("Title section").innerHTML =json_arr[0].title;
-			document.getElementById("PostContent").innerHTML =json_arr[0].Text;
+			document.getElementById("PostContent").innerHTML ='<img src="TestImage.jpg" alt="Image Goes Here" id="PostImage" align="left">'+json_arr[0].Text;
+			document.getElementById("PostImage").alt  =json_arr[0].ImagePath;
+			document.getElementById("PostImage").src  ="PostImages/"+json_arr[0].ImagePath;
 		}
 	
 		function QouteServerResponded(){ // called when the server responds to message 

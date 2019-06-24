@@ -39,7 +39,7 @@ function GetPostID()
 	}catch(PDOException $ex){
 		return "open error: " . mysqli_connect_error() ;
 	}
-	$sql = 'select PostID,max(PostID) From Posts;';
+	$sql = 'SELECT PostID FROM Posts ORDER BY LENGTH(PostID) Desc, PostID Desc;';
 	$proc_get_authors = $conn->prepare($sql);
 	
 	try{
@@ -107,6 +107,117 @@ function get_all_messages()
 
 
 	$sql = 'SELECT * FROM MessageBoard ORDER BY LENGTH(MessageID) Desc, MessageID Desc LIMIT 10;';  
+
+	$proc_get_authors = $conn->prepare($sql);
+	
+	try{
+
+		$rs = $proc_get_authors->execute(); 
+	}catch(PDOException $ex){
+		$conn = null; 
+		return "Bad sql";
+	}
+
+	$rows = array(); 
+
+	while($row = $proc_get_authors->fetch(PDO::FETCH_ASSOC)){
+		$rows[] = $row; 
+	}
+
+	$retVal = json_encode($rows); 
+	$conn = null; 
+
+	return $retVal; 
+
+}
+function Downvote($ID)
+{
+	$conn; 
+
+	try{
+
+		$conn = ConnectToDataBase(); 
+
+	}catch(PDOException $ex){
+		return "open error: " . mysqli_connect_error() ; 
+	}
+
+
+	$sql = 'UPDATE Posts SET Score = CAST(Score AS int) - 1 WHERE PostID="'.$ID.'"and CAST(Score AS int) > 0;';  
+
+	$proc_get_authors = $conn->prepare($sql);
+	
+	try{
+
+		$rs = $proc_get_authors->execute(); 
+	}catch(PDOException $ex){
+		$conn = null; 
+		return "Bad sql";
+	}
+
+	$rows = array(); 
+
+	while($row = $proc_get_authors->fetch(PDO::FETCH_ASSOC)){
+		$rows[] = $row; 
+	}
+
+	$retVal = json_encode($rows); 
+	$conn = null; 
+
+	return $retVal; 
+
+}
+function Upvote($ID)
+{
+	$conn; 
+
+	try{
+
+		$conn = ConnectToDataBase(); 
+
+	}catch(PDOException $ex){
+		return "open error: " . mysqli_connect_error() ; 
+	}
+
+
+	$sql = 'UPDATE Posts SET Score = CAST(Score AS int) + 1 WHERE PostID="'.$ID.'";';  
+
+	$proc_get_authors = $conn->prepare($sql);
+	
+	try{
+
+		$rs = $proc_get_authors->execute(); 
+	}catch(PDOException $ex){
+		$conn = null; 
+		return "Bad sql";
+	}
+
+	$rows = array(); 
+
+	while($row = $proc_get_authors->fetch(PDO::FETCH_ASSOC)){
+		$rows[] = $row; 
+	}
+
+	$retVal = json_encode($rows); 
+	$conn = null; 
+
+	return $retVal; 
+
+}
+function get_all_posts()
+{
+	$conn; 
+
+	try{
+
+		$conn = ConnectToDataBase(); 
+
+	}catch(PDOException $ex){
+		return "open error: " . mysqli_connect_error() ; 
+	}
+
+
+	$sql = 'SELECT * FROM Posts ORDER BY LENGTH(Score) Desc, Score Desc LIMIT 20;';  
 
 	$proc_get_authors = $conn->prepare($sql);
 	
